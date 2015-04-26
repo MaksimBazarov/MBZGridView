@@ -24,6 +24,8 @@
 
 @property(nonatomic, assign) UIEdgeInsets contentInset;
 
+-(void)reloadData;
+
 - (MBZGridViewLeftHeaderCell *)dequeueReusableLeftHeaderCellForRow:(NSInteger)row;
 
 - (MBZGridViewTopHeaderCell *)dequeueReusableTopHeaderCellForCol:(NSInteger)col;

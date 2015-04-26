@@ -28,6 +28,7 @@
 
 @implementation MBZGridView
 
+#pragma mark - Initializtion
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
@@ -41,8 +42,57 @@
     if (self) {
         [self setupGlobal];
     }
-
     return self;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        [self setupGlobal];
+    }
+    return self;
+}
+
+- (UIScrollView *)topHeaderView {
+    if (!_topHeaderView) {
+        _topHeaderView = [[UIScrollView alloc] init];
+    }
+    return _topHeaderView;
+}
+
+- (UIScrollView *)leftHeaderView {
+    if (!_leftHeaderView) {
+        _leftHeaderView = [[UIScrollView alloc] init];
+    }
+    return _leftHeaderView;
+}
+
+- (UIScrollView *)contentView {
+    if (!_contentView) {
+        _contentView = [[UIScrollView alloc] init];
+    }
+    return _contentView;
+}
+
+- (NSMutableDictionary *)leftCells {
+    if (!_leftCells) {
+        _leftCells = [[NSMutableDictionary alloc] init];
+    }
+    return _leftCells;
+}
+
+- (NSMutableDictionary *)topCells {
+    if (!_topCells) {
+        _topCells = [[NSMutableDictionary alloc] init];
+    }
+    return _topCells;
+}
+
+- (NSMutableDictionary *)contentCells {
+    if (!_contentCells) {
+        _contentCells = [[NSMutableDictionary alloc] init];
+    }
+    return _contentCells;
 }
 
 - (void)setupGlobal {
@@ -70,26 +120,29 @@
     [self addSubview:self.topHeaderView];
 }
 
+#pragma mark - Update
 
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    
-    //Clear cells text
-        NSDate *start = [NSDate date];
-        [self clearAllCells];
-        //Layout scroll views
-        [self layoutLeftHeaderView];
-        [self layoutTopHeaderView];
-        [self layoutContentView];
-        //Layout cells
-        [self layoutLeftHeaderCells];
-        [self layoutTopHeaderCells];
-        [self layoutContentCells];
-        NSTimeInterval timeInterval = [start timeIntervalSinceNow];
-        NSLog(@"Time: %f",timeInterval);
+- (void)reloadData {
+    [self clearAllCells];
+    //Layout scroll views
+    [self layoutLeftHeaderView];
+    [self layoutTopHeaderView];
+    [self layoutContentView];
+    //create cells
+    [self createLeftHeaderCells];
+    [self createTopHeaderCells];
+    [self createContentCells];
+
 }
 
 #pragma mark - Layout
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    [self layoutLeftHeaderView];
+    [self layoutTopHeaderView];
+    [self layoutContentView];
+}
 
 - (void)layoutContentView {
     CGFloat height = CGRectGetHeight(self.bounds) - self.headerRowHeight;
@@ -121,11 +174,9 @@
     self.topHeaderView.frame = CGRectMake(left, top, width, height);
 }
 
-#pragma mark - Cells Layout
+#pragma mark - Cells Creation
 
-- (void)layoutLeftHeaderCells {
-
-       
+- (void)createLeftHeaderCells {
     NSInteger rowsCount = [self.dataSource numberOfRowsInGridView:self];
     for (NSInteger row = 0; row < rowsCount; ++row) {
         MBZGridViewLeftHeaderCell *cell = [self.dataSource gridView:self leftHeaderForRow:row];
@@ -140,14 +191,13 @@
             cell.index = row;
             [self addleftHeaderCell:cell forRow:row];
         }
-
         self.leftHeaderView.contentSize = CGSizeMake(self.headerColumnWidth, rowsCount * self.headerRowHeight);
         self.leftHeaderView.contentInset = self.contentInset;
     }
-        
 }
 
-- (void)layoutTopHeaderCells {
+
+- (void)createTopHeaderCells {
 
     NSInteger columnsCount = [self.dataSource numberOfColumnsInGridView:self];
     CGFloat contentWidth = 0;
@@ -170,8 +220,7 @@
     }
 }
 
-
-- (void)layoutContentCells {
+- (void)createContentCells {
 
     NSInteger columnsCount = [self.dataSource numberOfColumnsInGridView:self];
     NSInteger rowsCount = [self.dataSource numberOfRowsInGridView:self];
@@ -202,12 +251,6 @@
 
     self.contentView.contentSize = CGSizeMake(contentWidth, rowsCount * self.headerRowHeight);
     self.contentView.contentInset = self.leftHeaderView.contentInset;
-}
-
-- (void)addSeparatorForCell:(MBZGridViewCell *)cell {
-//    UIView *separator = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(cell.bounds) - 0.3f, self.headerColumnWidth, CGRectGetMaxY(cell.bounds))];
-//
-//    [cell addSubview:separator];
 }
 
 - (void)addContentCell:(MBZGridViewCell *)cell forColumn:(NSInteger)column forRow:(NSInteger)row {
@@ -250,50 +293,6 @@
 - (NSString *)contentCellKeyForRow:(NSInteger)row col:(NSInteger)col {
     NSString *key = [NSString stringWithFormat:@"%li:%li", (long) row, (long) col];
     return key;
-}
-
-#pragma mark - Auto initialization
-
-- (UIScrollView *)topHeaderView {
-    if (!_topHeaderView) {
-        _topHeaderView = [[UIScrollView alloc] init];
-    }
-    return _topHeaderView;
-}
-
-- (UIScrollView *)leftHeaderView {
-    if (!_leftHeaderView) {
-        _leftHeaderView = [[UIScrollView alloc] init];
-    }
-    return _leftHeaderView;
-}
-
-- (UIScrollView *)contentView {
-    if (!_contentView) {
-        _contentView = [[UIScrollView alloc] init];
-    }
-    return _contentView;
-}
-
-- (NSMutableDictionary *)leftCells {
-    if (!_leftCells) {
-        _leftCells = [[NSMutableDictionary alloc] init];
-    }
-    return _leftCells;
-}
-
-- (NSMutableDictionary *)topCells {
-    if (!_topCells) {
-        _topCells = [[NSMutableDictionary alloc] init];
-    }
-    return _topCells;
-}
-
-- (NSMutableDictionary *)contentCells {
-    if (!_contentCells) {
-        _contentCells = [[NSMutableDictionary alloc] init];
-    }
-    return _contentCells;
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -349,22 +348,6 @@
 - (CGFloat)headerColumnWidth {
     CGFloat width = [self.delegate widthForHeaderForGridView:self];
     return width ?: 75.f;
-}
-
-- (NSUInteger)columnCount {
-    NSUInteger count = (NSUInteger) [self.dataSource numberOfColumnsInGridView:self];
-    return count;
-}
-
-- (NSUInteger)rowCount {
-    NSUInteger count = (NSUInteger) [self.dataSource numberOfRowsInGridView:self];
-    return count;
-}
-
-
-- (CGFloat)rowHeight {
-//    return _rowHeight;
-    return 30;
 }
 
 #pragma mark - MBZGridViewCellDelegate
