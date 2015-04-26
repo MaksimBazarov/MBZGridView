@@ -128,7 +128,6 @@
 
 - (void)layoutLeftHeaderCells {
 
-    ANDispatchBlockToBackgroundQueue(^{
        
     NSInteger rowsCount = [self.dataSource numberOfRowsInGridView:self];
     for (NSInteger row = 0; row < rowsCount; ++row) {
@@ -149,7 +148,6 @@
         self.leftHeaderView.contentInset = self.contentInset;
     }
         
-    });
 }
 
 - (void)layoutTopHeaderCells {
