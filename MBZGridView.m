@@ -75,7 +75,6 @@
     [super layoutSubviews];
     
     //Clear cells text
-    ANDispatchBlockToMainQueue(^{
         NSDate *start = [NSDate date];
         [self clearAllCells];
         //Layout scroll views
@@ -88,8 +87,6 @@
         [self layoutContentCells];
         NSTimeInterval timeInterval = [start timeIntervalSinceNow];
         NSLog(@"Time: %f",timeInterval);
-    });
-
 }
 
 #pragma mark - Layout
